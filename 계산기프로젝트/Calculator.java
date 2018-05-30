@@ -69,7 +69,7 @@ public class Calculator
 
 				char s = str.charAt(to);
 				if(isDecimal(s)) {
-					//ï¿½ï¿½ï¿½ï¿½ ï¿½Î½ï¿½
+					//¼ýÀÚ ÀÎ½Ä
 					while(isDecimal(s) || s == '.') { 
 						to++;
 						if(to >= str.length()) break;
@@ -80,12 +80,12 @@ public class Calculator
 					state.add(0);
 				}
 				else {
-					//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Î½ï¿½
+					//¿¬»êÀÚ ÀÎ½Ä
 					char op = str.charAt(i);
 					if(opStack.size() == 0)
 						opStack.push(""+op);
 					else if(op == '+' || op == '-' || isUnaryOp(op)) { 
-						//ï¿½ì¼±ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+						//¿ì¼±¼øÀ§ ³·À½
 						while(!opStack.empty()) {
 							String t = opStack.pop();
 							postfix.add(t);
@@ -94,7 +94,7 @@ public class Calculator
 						opStack.push("" + op);
 					}
 					else { 
-						//ï¿½ì¼±ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+						//¿ì¼±¼øÀ§ ³ôÀ½
 						while(!opStack.empty()) {
 							char op_top = opStack.peek().charAt(0);
 							if(op_top == '+' || op_top == '-')

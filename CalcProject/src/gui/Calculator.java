@@ -81,7 +81,7 @@ public class Calculator
 		}
 		
 		boolean isUnaryOp(char x) {
-			if(x == '<' || x == 'l' || x == 's' || x == 'c' || x == 't' || x == 'B' || x == 'O' || x == 'H' || x =='U' || x == 'D') return true;
+			if(x == '<' || x == 'l' || x == 's' || x == 'c' || x == 't' || x == 'B' || x == 'O' || x == 'H' || x =='U' || x == 'D' || x == '%') return true;
 			return false;
 		}
 		
@@ -144,6 +144,8 @@ public class Calculator
 			}
 			
 			Stack<Double> res = new Stack<Double>();
+			int logicRes; // 로직 결과값 저장 
+			String logicResult; // 로직 결과값 저장 
 			
 			for(int i=0;i<postfix.size();i++) {
 				String s = postfix.get(i);
@@ -165,7 +167,8 @@ public class Calculator
 						res.push(Math.cos(r1));
 					else if(op == 't') // tan 
 						res.push(Math.tan(r1));
-					
+					else if(op == '%')
+						res.push(r1 * 0.01);	
 
 					// Binary 연산 추가 
 					else if(op == 'B') {//to Binar
@@ -204,7 +207,9 @@ public class Calculator
 						return null;
 					}
 					else if(op == 'n') { //not
-
+						logicRes = ~(int)r1;
+						logicResult = Integer.toBinaryString(logicRes);
+						resultWindow.setText(logicResult);
 						checkLogic = true;
 						return null;
 					}
@@ -227,18 +232,22 @@ public class Calculator
 							res.push(r2 * Math.pow(10, r1));
 						// Logic 추가 
 						if(op == 'a') {
-	
-							checkLogic = true;//and
-							return null;
-						}
-						if(op == 'x') { //xor
-
+							logicRes = (int)r1 & (int)r2;
+							logicResult = Integer.toBinaryString(logicRes);
+							res.push(Double.parseDouble(logicResult));
 							checkLogic = true;
-							return null;
 						}
-						if(op == 'o') { //or
+						if(op == 'x') {
+							logicRes = (int)r1 ^ (int)r2;
+							logicResult = Integer.toBinaryString(logicRes);
+							res.push(Double.parseDouble(logicResult));
 							checkLogic = true;
-							return null;
+						}
+						if(op == 'o') {
+							logicRes = (int)r1 | (int)r2;
+							logicResult = Integer.toBinaryString(logicRes);
+							res.push(Double.parseDouble(logicResult));
+							checkLogic = true;
 						}
 
 					}
@@ -361,28 +370,28 @@ public class Calculator
 				checkBin = false;
 			}
 			
-			
-			else if(name.equals("%")) {
-				int i = 0;
-				for(i=code.length()-1;i>=0;i--) {
-					if(!(isDecimal(code.charAt(i)) || code.charAt(i)=='.'))
-						break;
-				}
-				char op = code.charAt(i);
-				double solval = Double.parseDouble(solve(code.substring(0,i)));
-				double perval = Double.parseDouble(solve(code.substring(i+1,code.length())));
-				double res = 0;
-				if(op == '+')
-					res = solval + solval * perval / 100.0;
-				else if(op == '-')
-					res = solval - solval * perval / 100.0;
-				else if(op == '*')
-					res = solval * perval / 100.0;
-				else if(op == '/')
-					res = solval * 100 / perval;
-					
-				resultWindow.setText(res + "");				
-			}
+//			
+//			else if(name.equals("%")) {
+//				int i = 0;
+//				for(i=code.length()-1;i>=0;i--) {
+//					if(!(isDecimal(code.charAt(i)) || code.charAt(i)=='.'))
+//						break;
+//				}
+//				char op = code.charAt(i);
+//				double solval = Double.parseDouble(solve(code.substring(0,i)));
+//				double perval = Double.parseDouble(solve(code.substring(i+1,code.length())));
+//				double res = 0;
+//				if(op == '+')
+//					res = solval + solval * perval / 100.0;
+//				else if(op == '-')
+//					res = solval - solval * perval / 100.0;
+//				else if(op == '*')
+//					res = solval * perval / 100.0;
+//				else if(op == '/')
+//					res = solval * 100 / perval;
+//					
+//				resultWindow.setText(res + "");				
+//			}
 			
 			else {
 				for(int i=0;i<=9;i++) {					
@@ -393,7 +402,10 @@ public class Calculator
 				}
 				for(int i=0;i<opButtons.length;i++)
 					if(b.getText().equals(""+opSet[i])) {
-						if(opSet[i].equals("<"))
+						if(opSet[i].equals("%")) {
+							expressionLabel.setText(expressionLabel.getText() + opSet[i]);
+						}
+						else if(opSet[i].equals("<"))
 							expressionLabel.setText("<(" + expressionLabel.getText() + ")");
 						else
 							expressionLabel.setText(expressionLabel.getText()+opSet[i]);
@@ -411,25 +423,22 @@ public class Calculator
 						//log:l; exp:e; sin:s; cos:c; tan:t;
 					}
 				
-				// 작업할 곳 
 				//logic button
 				for(int i = 0 ; i< opLogicButtons.length ; i++)					
 					if(b.getText().equals(""+opLogicSet[i])) {
-						char op = b.getText().charAt(i);
-						int solval = Integer.parseInt(solve(code.substring(0,i)));
-						int perval = Integer.parseInt(solve(code.substring(i+1,code.length())));
-						int res = 0;
-						if(op == 'a')
-							res = solval & perval;
-						else if(op == 'x')
-							res = solval ^ perval;
-						else if(op == 'o')
-							res = solval | perval;
-						else if(op == 'n')
-							res = ~solval;
-							
-						resultWindow.setText(Integer.toBinaryString(res) + "");		
+						if(name.equals("not")) {
+							expressionLabel.setText("~" + expressionLabel.getText());
+							code += opLogicSet[i].charAt(0);
+							solve(code);
+						}
+						else {
+							expressionLabel.setText(expressionLabel.getText() + opLogicSet[i]);
+							code += opLogicSet[i].charAt(0);
+						}
+						
 					}
+			
+				}
 				
 				//
 				
@@ -456,7 +465,7 @@ public class Calculator
 				
 			}
 		}	
-	}
+	
 
 	private void addToPanel(JPanel p, GridBagConstraints gbc, Component c, int x, int y, int w, int h) {
 		gbc.gridx = x;
